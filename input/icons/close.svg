@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933333 16.933333"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1">
+    <g
+       style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"
+       id="g2"
+       transform="matrix(0.70554871,0,0,0.7055561,2.1054722e-4,1.7359722e-4)">
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:#000000;stroke:none;stroke-linecap:butt;stroke-linejoin:miter;enable-background:accumulate;stop-color:#000000;stop-opacity:1;opacity:1"
+         d="M 17.292969,5.2929687 5.2929687,17.292969 a 1,1 0 0 0 0,1.414062 1,1 0 0 0 1.4140625,0 L 18.707031,6.7070312 a 1,1 0 0 0 0,-1.4140625 1,1 0 0 0 -1.414062,0 z"
+         id="path1-82" />
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:#000000;stroke:none;stroke-linecap:butt;stroke-linejoin:miter;enable-background:accumulate;stop-color:#000000;stop-opacity:1;opacity:1"
+         d="m 6,5 a 1,1 0 0 0 -0.7070313,0.2929687 1,1 0 0 0 0,1.4140625 L 17.292969,18.707031 a 1,1 0 0 0 1.414062,0 1,1 0 0 0 0,-1.414062 L 6.7070312,5.2929687 A 1,1 0 0 0 6,5 Z"
+         id="path2" />
+    </g>
+  </g>
+</svg>
