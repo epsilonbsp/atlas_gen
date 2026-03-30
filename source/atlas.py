@@ -22,19 +22,16 @@ def atlas_generate_fonts():
 
         print(f"Generated: {out_dir}/")
 
-def atlas_shelf_pack(items, start_y = ATLAS_PADDING):
+def atlas_shelf_pack(items, size, start_y = ATLAS_PADDING):
     shelf_x = ATLAS_PADDING
     shelf_y = start_y
     shelf_h = 0
 
     for item in items:
-        if shelf_x + item["w"] > ATLAS_SIZE - ATLAS_PADDING:
+        if shelf_x + item["w"] > size - ATLAS_PADDING:
             shelf_y = shelf_y + shelf_h + ATLAS_PADDING
             shelf_x = ATLAS_PADDING
             shelf_h = 0
-
-        if shelf_y + item["h"] > ATLAS_SIZE - ATLAS_PADDING:
-            raise RuntimeError(f"Atlas full, cannot fit {item['w']}x{item['h']}")
 
         item["x"] = shelf_x
         item["y"] = shelf_y
@@ -60,9 +57,42 @@ def atlas_build():
         items.append({"type": "font", "name": name, "w": w, "h": h, "font_json": font_json})
 
     items = sorted(items, key = lambda x: x["h"], reverse = True)
-    atlas_shelf_pack(items, start_y = ATLAS_PADDING + 2 + ATLAS_PADDING)
 
-    atlas = bytearray(ATLAS_SIZE * ATLAS_SIZE * 4)
+    start_y = ATLAS_PADDING + 2 + ATLAS_PADDING
+    min_w = max(item["w"] for item in items) + 2 * ATLAS_PADDING
+    max_w = sum(item["w"] for item in items) + (len(items) + 1) * ATLAS_PADDING
+
+    best_w, best_h, best_area = None, None, float("inf")
+
+    for w in range(min_w, max_w + 1):
+        for item in items:
+            item.pop("x", None)
+            item.pop("y", None)
+
+        atlas_shelf_pack(items, w, start_y = start_y)
+
+        h = max(item["y"] + item["h"] for item in items) + ATLAS_PADDING
+
+        if w > ATLAS_MAX_SIZE or h > ATLAS_MAX_SIZE:
+            break
+
+        area = w * h
+
+        if area < best_area:
+            best_w, best_h, best_area = w, h, area
+
+    if best_w is None:
+        raise RuntimeError(f"Items exceed maximum atlas size ({ATLAS_MAX_SIZE})")
+
+    for item in items:
+        item.pop("x", None)
+        item.pop("y", None)
+
+    atlas_shelf_pack(items, best_w, start_y = start_y)
+
+    atlas_w, atlas_h = best_w, best_h
+    print(f"Atlas size: {atlas_w}x{atlas_h}")
+    atlas = bytearray(atlas_w * atlas_h * 4)
 
     for item in items:
         dx = item["x"]
@@ -73,10 +103,10 @@ def atlas_build():
         if item["type"] == "font":
             name = item["name"]
             rgba = (TEMP_FONTS_DIR_PATH / name / "font.rgba").read_bytes()
-            image_blit(atlas, ATLAS_SIZE, rgba, w, h, dx, dy)
+            image_blit(atlas, atlas_w, rgba, w, h, dx, dy)
 
             font_json = item["font_json"]
-            y_shift = ATLAS_SIZE - h - dy
+            y_shift = atlas_h - h - dy
 
             for glyph in font_json["glyphs"]:
                 if "atlasBounds" in glyph:
@@ -85,13 +115,13 @@ def atlas_build():
                     glyph["atlasBounds"]["bottom"] += y_shift
                     glyph["atlasBounds"]["top"] += y_shift
 
-            font_json["atlas"]["width"] = ATLAS_SIZE
-            font_json["atlas"]["height"] = ATLAS_SIZE
+            font_json["atlas"]["width"] = atlas_w
+            font_json["atlas"]["height"] = atlas_h
 
             with open(OUTPUT_DIR_PATH / "fonts" / f"{name}.json", "w") as f:
                 json.dump(font_json, f, separators = (',', ':'))
 
             print(f"JSON: {OUTPUT_DIR_PATH / 'fonts' / name}.json")
 
-    image_write_png(OUTPUT_DIR_PATH / "atlas.png", ATLAS_SIZE, ATLAS_SIZE, atlas)
+    image_write_png(OUTPUT_DIR_PATH / "atlas.png", atlas_w, atlas_h, atlas)
     print(f"Atlas: {OUTPUT_DIR_PATH / 'atlas.png'}")
