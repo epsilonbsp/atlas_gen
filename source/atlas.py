@@ -154,14 +154,17 @@ def atlas_build():
 
             print(f"JSON: {OUTPUT_DIR_PATH / 'fonts' / name}.json")
 
-    icons_json = {}
+    icons_json = {
+        "atlas": {"width": atlas_w, "height": atlas_h, "distanceRange": ATLAS_PXRANGE},
+        "icons": [],
+    }
 
     for item in items:
         if item["type"] == "icon":
             name = item["name"]
             rgba = (TEMP_ICONS_DIR_PATH / f"{name}.rgba").read_bytes()[12:]
             image_blit(atlas, atlas_w, rgba, item["w"], item["h"], item["x"], item["y"])
-            icons_json[name] = {"x": item["x"], "y": item["y"], "w": item["w"], "h": item["h"]}
+            icons_json["icons"].append({"key": name, "x": item["x"], "y": item["y"], "w": item["w"], "h": item["h"]})
 
     if icons_json:
         with open(OUTPUT_DIR_PATH / "icons" / "icons.json", "w") as f:
