@@ -1,5 +1,6 @@
 import json
 import subprocess
+import xml.etree.ElementTree as ET
 
 from .config import *
 from .image import *
@@ -22,6 +23,28 @@ def atlas_generate_fonts():
 
         print(f"Generated: {out_dir}/")
 
+def atlas_generate_icons():
+    TEMP_ICONS_DIR_PATH.mkdir(parents = True, exist_ok = True)
+
+    for svg_path in INPUT_ICONS_DIR_PATH.glob("*.svg"):
+        name = svg_path.stem
+        root = ET.parse(svg_path).getroot()
+        w = int(float(root.get("width")))
+        h = int(float(root.get("height")))
+
+        subprocess.run([
+            str(MSDF_GEN_EXE_PATH),
+            "mtsdf",
+            "-svg", str(svg_path),
+            "-autoframe",
+            "-o", str(TEMP_ICONS_DIR_PATH / f"{name}.rgba"),
+            "-size", str(w), str(h),
+            "-pxrange", str(ATLAS_PXRANGE),
+            "-format", "rgba",
+        ], check = True)
+
+        print(f"Generated: {TEMP_ICONS_DIR_PATH / name}.rgba")
+
 def atlas_shelf_pack(items, size, start_y = ATLAS_PADDING):
     shelf_x = ATLAS_PADDING
     shelf_y = start_y
@@ -43,6 +66,7 @@ def atlas_shelf_pack(items, size, start_y = ATLAS_PADDING):
 def atlas_build():
     OUTPUT_DIR_PATH.mkdir(parents = True, exist_ok = True)
     (OUTPUT_DIR_PATH / "fonts").mkdir(parents = True, exist_ok = True)
+    (OUTPUT_DIR_PATH / "icons").mkdir(parents = True, exist_ok = True)
 
     items = []
 
@@ -55,6 +79,13 @@ def atlas_build():
         w = font_json["atlas"]["width"]
         h = font_json["atlas"]["height"]
         items.append({"type": "font", "name": name, "w": w, "h": h, "font_json": font_json})
+
+    for svg_path in INPUT_ICONS_DIR_PATH.glob("*.svg"):
+        name = svg_path.stem
+        root = ET.parse(svg_path).getroot()
+        w = int(float(root.get("width")))
+        h = int(float(root.get("height")))
+        items.append({"type": "icon", "name": name, "w": w, "h": h})
 
     items = sorted(items, key = lambda x: x["h"], reverse = True)
 
@@ -76,7 +107,7 @@ def atlas_build():
         if w > ATLAS_MAX_SIZE or h > ATLAS_MAX_SIZE:
             break
 
-        area = w * h
+        area = w * h * (max(w, h) / min(w, h))
 
         if area < best_area:
             best_w, best_h, best_area = w, h, area
@@ -102,7 +133,7 @@ def atlas_build():
 
         if item["type"] == "font":
             name = item["name"]
-            rgba = (TEMP_FONTS_DIR_PATH / name / "font.rgba").read_bytes()
+            rgba = (TEMP_FONTS_DIR_PATH / name / "font.rgba").read_bytes()[12:]
             image_blit(atlas, atlas_w, rgba, w, h, dx, dy)
 
             font_json = item["font_json"]
@@ -122,6 +153,21 @@ def atlas_build():
                 json.dump(font_json, f, separators = (',', ':'))
 
             print(f"JSON: {OUTPUT_DIR_PATH / 'fonts' / name}.json")
+
+    icons_json = {}
+
+    for item in items:
+        if item["type"] == "icon":
+            name = item["name"]
+            rgba = (TEMP_ICONS_DIR_PATH / f"{name}.rgba").read_bytes()[12:]
+            image_blit(atlas, atlas_w, rgba, item["w"], item["h"], item["x"], item["y"])
+            icons_json[name] = {"x": item["x"], "y": item["y"], "w": item["w"], "h": item["h"]}
+
+    if icons_json:
+        with open(OUTPUT_DIR_PATH / "icons" / "icons.json", "w") as f:
+            json.dump(icons_json, f, separators = (',', ':'))
+
+        print(f"JSON: {OUTPUT_DIR_PATH / 'icons' / 'icons.json'}")
 
     image_write_png(OUTPUT_DIR_PATH / "atlas.png", atlas_w, atlas_h, atlas)
     print(f"Atlas: {OUTPUT_DIR_PATH / 'atlas.png'}")

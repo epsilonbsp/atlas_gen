@@ -21,8 +21,10 @@ command = sys.argv[1]
 arg0 = sys.argv[2] if argc > 2 else ""
 
 if command == "install":
+    download_msdf_gen()
     download_msdf_atlas_gen()
     download_sample_font()
 elif command == "generate":
     atlas_generate_fonts()
+    atlas_generate_icons()
     atlas_build()

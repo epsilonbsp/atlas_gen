@@ -12,24 +12,27 @@ class Unpack_Status(IntEnum):
 
 def unpack_file(archive_path: str|Path, unpack_path: str|Path, strip_top_level: bool = False) -> tuple[Unpack_Status, Exception | None]:
     try:
+        top_level_name = None
+
         if zipfile.is_zipfile(archive_path):
             with zipfile.ZipFile(archive_path, "r") as archive:
+                if strip_top_level:
+                    top_level_name = Path(archive.namelist()[0]).parts[0]
+
                 archive.extractall(unpack_path)
         elif tarfile.is_tarfile(archive_path):
             with tarfile.open(archive_path, "r:*") as archive:
+                if strip_top_level:
+                    top_level_name = Path(archive.getnames()[0]).parts[0]
+
                 archive.extractall(unpack_path)
         else:
             raise Exception("Unsupported archive type")
 
-        if strip_top_level:
-            items = [
-                os.path.join(unpack_path, item)
-                for item in os.listdir(unpack_path)
-            ]
+        if strip_top_level and top_level_name:
+            top_folder = os.path.join(unpack_path, top_level_name)
 
-            if len(items) == 1 and os.path.isdir(items[0]):
-                top_folder = items[0]
-
+            if os.path.isdir(top_folder):
                 for item in os.listdir(top_folder):
                     shutil.move(
                         os.path.join(top_folder, item),
