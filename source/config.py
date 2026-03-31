@@ -40,7 +40,6 @@ SAMPLE_FONT_DOWNLOAD_PATH = DOWNLOADS_DIR_PATH / "spacemono.zip"
 SAMPLE_FONT_INSTALL_PATH = BUILD_DIR_PATH / "spacemono"
 SAMPLE_FONT_FILES = {
     SAMPLE_FONT_INSTALL_PATH / "fonts" / "SpaceMono-Bold.ttf": INPUT_FONTS_DIR_PATH / "bold.ttf",
-    SAMPLE_FONT_INSTALL_PATH / "fonts" / "SpaceMono-BoldItalic.ttf": INPUT_FONTS_DIR_PATH / "bold_italic.ttf",
     SAMPLE_FONT_INSTALL_PATH / "fonts" / "SpaceMono-Italic.ttf": INPUT_FONTS_DIR_PATH / "italic.ttf",
     SAMPLE_FONT_INSTALL_PATH / "fonts" / "SpaceMono-Regular.ttf": INPUT_FONTS_DIR_PATH / "regular.ttf"
 }
@@ -86,7 +85,7 @@ def download_msdf_atlas_gen():
         )
 
 def download_sample_font():
-    if not DOWNLOADS_DIR_PATH.exists():
+    if not SAMPLE_FONT_DOWNLOAD_PATH.exists():
         download_file_and_log(
             SAMPLE_FONT_NAME,
             SAMPLE_FONT_DOWNLOAD_URL,
