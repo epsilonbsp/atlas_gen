@@ -8,7 +8,7 @@
    stroke-width="2"
    stroke-linecap="round"
    stroke-linejoin="round"
-   class="lucide lucide-check-icon lucide-check"
+   class="lucide lucide-chevron-left-icon lucide-chevron-left"
    version="1.1"
    id="svg1"
    xmlns="http://www.w3.org/2000/svg"
@@ -17,6 +17,6 @@
      id="defs1" />
   <path
      style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#000000;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
-     d="M 38.585938,10.585937 18,31.171876 9.4140624,22.585938 a 2,2 0 0 0 -2.8281248,0 2,2 0 0 0 0,2.828124 l 10.0000004,10 a 2.0002,2.0002 0 0 0 2.828125,0 l 21.999999,-22 a 2,2 0 0 0 0,-2.828125 2,2 0 0 0 -2.828124,0 z"
+     d="m 30,10 a 2,2 0 0 0 -1.414062,0.585937 l -12,12.000001 a 2.0002,2.0002 0 0 0 0,2.828124 l 12,12 a 2,2 0 0 0 2.828124,0 2,2 0 0 0 0,-2.828124 L 20.828126,24 31.414062,13.414062 a 2,2 0 0 0 0,-2.828125 A 2,2 0 0 0 30,10 Z"
      id="path1" />
 </svg>
